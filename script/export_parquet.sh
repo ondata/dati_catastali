@@ -36,25 +36,25 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
   echo "Processing $file"
   name=$(basename "${file}" | cut -d. -f1)
 
-  # Se il file parquet esiste già, salta al prossimo file
+  # If parquet file already exists, skip to next file
   if [ -f "${output_dir}/${name}.parquet" ]; then
     echo "File ${name}.parquet already exists, skipping..."
     continue
   fi
 
-  # pulisci la directory tmp prima di iniziare
+  # clean the tmp directory before starting
   rm -rf "${tmp_dir}"/*
 
-  # Copia il file zip in locale
+  # Copy the zip file locally
   cp "$file" "${tmp_dir}/"
 
-  # Estrai il file dalla copia locale
+  # Extract file from local copy
   unzip -o "${tmp_dir}/$(basename "$file")" -d "${tmp_dir}"
 
-  # Rimuovi il file zip temporaneo
+  # Remove temporary zip file
   rm "${tmp_dir}/$(basename "$file")"
 
-  # verifica se il file estratto ha il nome corretto, altrimenti rinominalo
+  # check if extracted file has correct name, rename it if not
   extracted_file=$(find "${tmp_dir}" -name "*.gpkg" -type f)
   if [ "$(basename "$extracted_file")" != "${name}.gpkg" ]; then
     mv "$extracted_file" "${tmp_dir}/${name}.gpkg"
@@ -62,18 +62,18 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
 
   duckdb -c "copy
   (SELECT INSPIREID_LOCALID,
-      -- Codice comune (CCCC)
+      -- Municipality code (CCCC)
       regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.([A-Z]\\d{3})', 1) AS comune,
 
-      -- Foglio (primi 4 caratteri dopo il quinto carattere da 'PLA.')
+      -- Sheet number (first 4 characters after the fifth character from 'PLA.')
       regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[A-Z]\\d{3}[A-Z_]?(\\d{4})', 1) AS foglio,
 
-      -- Particella (solo numerica, escludendo quelle con lettere e stringhe vuote)
+      -- Parcel number (numeric only, excluding those with letters and empty strings)
       regexp_extract(gml_id, '\\.([0-9]+)$', 1) AS particella,CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x, CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
   FROM st_read('${tmp_dir}/${name}.gpkg')
   WHERE
       regexp_extract(gml_id, '\\.([0-9]+)$', 1) IS NOT NULL
-      AND regexp_extract(gml_id, '\\.([0-9]+)$', 1) <> ''  -- Evita stringhe vuote
+      AND regexp_extract(gml_id, '\\.([0-9]+)$', 1) <> ''  -- Avoid empty strings
   ORDER BY comune, foglio, TRY_CAST(particella AS INTEGER))
   TO '${tmp_dir}/${name}.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
 
@@ -82,7 +82,7 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
   find "${tmp_dir}" -type f -name "*.gpkg" -delete
 done
 
-# crea file indice
+# create index file
 
 find "${output_dir}" -type f -name "index.parquet" -delete
 
