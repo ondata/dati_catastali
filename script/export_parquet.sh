@@ -26,5 +26,5 @@ find "$input_dir" -type f -name "*.zip" | grep -P 'Valle' | while read -r file; 
     # Estrai il file nella directory di output
     unzip -o "$file" -d "${tmp_dir}"
     # Rinomina il file estratto
-    mv "${tmp_dir}"/${name}.gpkg" "${tmp_dir}"/${name}.gpkg"
+    mv "${tmp_dir}/${name}.gpkg" "${output_dir}/${name}.gpkg"
 done
