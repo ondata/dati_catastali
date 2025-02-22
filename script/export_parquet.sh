@@ -23,6 +23,13 @@ number_files=1
 find "$input_dir" -type f -name "*.zip" | while read -r file; do
   echo "Processing $file"
   name=$(basename "${file}" | cut -d. -f1)
+  
+  # Se il file parquet esiste già, salta al prossimo file
+  if [ -f "${output_dir}/${name}.parquet" ]; then
+    echo "File ${name}.parquet already exists, skipping..."
+    continue
+  fi
+
   # pulisci la directory tmp prima di iniziare
   rm -rf "${tmp_dir}"/*
   
