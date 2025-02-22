@@ -16,7 +16,7 @@ output_dir="/mnt/d/cat/output/particelle"
 
 number_files=1
 
-find "$input_dir" -type f -name "*.zip" | head -n $number_files | while read -r file; do
+find "$input_dir" -type f -name "*.zip" | grep -P 'Valle' | while read -r file; do
     echo "Processing $file"
     name=$(basename "${file}" | cut -d. -f1)
     # unzip il file $file in output_dir e dai all'output_dir il nome $name
