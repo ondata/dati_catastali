@@ -1,9 +1,27 @@
 #!/bin/bash
 
-set -x
 set -e
 set -u
 set -o pipefail
+
+# Check if correct number of arguments provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <input_directory> <output_directory>"
+    echo "Example: $0 /mnt/d/cat/data/particelle /mnt/d/cat/output/particelle"
+    exit 1
+fi
+
+input_dir="$1"
+output_dir="$2"
+
+# Verify input directory exists
+if [ ! -d "$input_dir" ]; then
+    echo "Error: Input directory '$input_dir' does not exist"
+    exit 1
+fi
+
+# Create output directory if it doesn't exist
+mkdir -p "$output_dir"
 
 folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -11,12 +29,8 @@ folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "${folder}"/tmp
 tmp_dir="${folder}"/tmp
 
-input_dir="/mnt/d/cat/data/particelle"
-
-mkdir -p "/mnt/d/cat/output"
-mkdir -p "/mnt/d/cat/output/particelle"
-
-output_dir="/mnt/d/cat/output/particelle"
+# Enable debug output after parameter checking
+set -x
 
 find "$input_dir" -type f -name "*.zip" | while read -r file; do
   echo "Processing $file"
