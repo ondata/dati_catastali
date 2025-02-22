@@ -21,10 +21,27 @@ output_dir="/mnt/d/cat/output/particelle"
 number_files=1
 
 find "$input_dir" -type f -name "*.zip" | grep -P 'Valle' | while read -r file; do
-    echo "Processing $file"
-    name=$(basename "${file}" | cut -d. -f1)
-    # Estrai il file nella directory di output
-    unzip -o "$file" -d "${tmp_dir}"
-    # Rinomina il file estratto
-    mv "${tmp_dir}/${name}.gpkg" "${output_dir}/${name}.gpkg"
+  echo "Processing $file"
+  name=$(basename "${file}" | cut -d. -f1)
+  # Estrai il file nella directory di output
+  unzip -o "$file" -d "${tmp_dir}"
+  # Rinomina il file estratto
+  mv "${tmp_dir}/${name}.gpkg" "${output_dir}/${name}.gpkg"
+
+  duckdb -c "copy
+  (SELECT INSPIREID_LOCALID,
+      -- Codice comune (CCCC)
+      regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.([A-Z]\\d{3})', 1) AS comune,
+
+      -- Foglio (primi 4 caratteri dopo il quinto carattere da 'PLA.')
+      regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[A-Z]\\d{3}[A-Z_]?(\\d{4})', 1) AS foglio,
+
+      -- Particella (solo numerica, escludendo quelle con lettere e stringhe vuote)
+      regexp_extract(gml_id, '\\.([0-9]+)$', 1) AS particella,CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x, CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
+  FROM st_read('${output_dir}/${name}.gpkg')
+  WHERE
+      regexp_extract(gml_id, '\\.([0-9]+)$', 1) IS NOT NULL
+      AND regexp_extract(gml_id, '\\.([0-9]+)$', 1) <> ''  -- Evita stringhe vuote
+  ORDER BY comune, foglio, TRY_CAST(particella AS INTEGER))
+  TO '${output_dir}/${name}.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
 done
