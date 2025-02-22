@@ -60,6 +60,7 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
     mv "$extracted_file" "${tmp_dir}/${name}.gpkg"
   fi
 
+  # create index parquet file for each gpkg file
   duckdb -c "copy
   (SELECT INSPIREID_LOCALID,
       -- Municipality code (CCCC)
@@ -82,7 +83,7 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
   find "${tmp_dir}" -type f -name "*.gpkg" -delete
 done
 
-# create index file
+# create index file for all parquet files
 
 find "${output_dir}" -type f -name "index.parquet" -delete
 
