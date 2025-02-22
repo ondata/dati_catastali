@@ -7,7 +7,7 @@ set -o pipefail
 # Check if correct number of arguments provided
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <input_directory> <output_directory>"
-    echo "Example: $0 /mnt/d/cat/data/particelle /mnt/d/cat/output/particelle"
+    echo "Example: $0 ~/catasto/particelle/gpkg ~/catasto/particelle/parquet"
     exit 1
 fi
 
