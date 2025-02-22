@@ -18,12 +18,10 @@ mkdir -p "/mnt/d/cat/output/particelle"
 
 output_dir="/mnt/d/cat/output/particelle"
 
-number_files=1
-
 find "$input_dir" -type f -name "*.zip" | while read -r file; do
   echo "Processing $file"
   name=$(basename "${file}" | cut -d. -f1)
-  
+
   # Se il file parquet esiste già, salta al prossimo file
   if [ -f "${output_dir}/${name}.parquet" ]; then
     echo "File ${name}.parquet already exists, skipping..."
@@ -32,13 +30,13 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
 
   # pulisci la directory tmp prima di iniziare
   rm -rf "${tmp_dir}"/*
-  
+
   # Copia il file zip in locale
   cp "$file" "${tmp_dir}/"
-  
+
   # Estrai il file dalla copia locale
   unzip -o "${tmp_dir}/$(basename "$file")" -d "${tmp_dir}"
-  
+
   # Rimuovi il file zip temporaneo
   rm "${tmp_dir}/$(basename "$file")"
 
@@ -69,3 +67,9 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
 
   find "${tmp_dir}" -type f -name "*.gpkg" -delete
 done
+
+# crea file indice
+
+find "${output_dir}" -type f -name "index.parquet" -delete
+
+duckdb -c "copy (select distinct comune, regexp_replace(filename, '^.+/', '') file from read_parquet('${output_dir}/*.parquet',filename = true) order by file,comune) to '${output_dir}/index.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
