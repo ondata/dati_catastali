@@ -25,6 +25,8 @@ mkdir -p "$output_dir"
 
 folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+mkdir -p "${folder}"/../risorse
+
 # create tmp dir
 mkdir -p "${folder}"/tmp
 tmp_dir="${folder}"/tmp
@@ -88,3 +90,12 @@ done
 find "${output_dir}" -type f -name "index.parquet" -delete
 
 duckdb -c "copy (select distinct comune, regexp_replace(filename, '^.+/', '') file from read_parquet('${output_dir}/*.parquet',filename = true) order by file,comune) to '${output_dir}/index.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
+
+# aggiungi codici istat e nome dei comuni
+curl -kL "https://raw.githubusercontent.com/aborruso/archivioDatiPubbliciPreziosi/master/docs/archivioComuniANPR/comuniANPR_ISTAT.csv" >"${folder}"/../risorse/comuniANPR_ISTAT.csv
+
+duckdb -c "copy (SELECT index.*,CODISTAT,DENOMINAZIONE_IT from '${output_dir}/index.parquet' AS index left join read_csv_auto('${folder}/../risorse/comuniANPR_ISTAT.csv') AS comuni on index.comune=comuni.CODCATASTALE order by file,comune) to '${folder}/tmp/index.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
+
+mv "${folder}/tmp/index.parquet" "${output_dir}/index.parquet"
+
+
