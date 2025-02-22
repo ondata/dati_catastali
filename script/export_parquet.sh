@@ -25,8 +25,15 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
   name=$(basename "${file}" | cut -d. -f1)
   # pulisci la directory tmp prima di iniziare
   rm -rf "${tmp_dir}"/*
-  # Estrai il file nella directory di output
-  unzip -o "$file" -d "${tmp_dir}"
+  
+  # Copia il file zip in locale
+  cp "$file" "${tmp_dir}/"
+  
+  # Estrai il file dalla copia locale
+  unzip -o "${tmp_dir}/$(basename "$file")" -d "${tmp_dir}"
+  
+  # Rimuovi il file zip temporaneo
+  rm "${tmp_dir}/$(basename "$file")"
 
   # verifica se il file estratto ha il nome corretto, altrimenti rinominalo
   extracted_file=$(find "${tmp_dir}" -name "*.gpkg" -type f)
