@@ -23,8 +23,17 @@ number_files=1
 find "$input_dir" -type f -name "*.zip" | grep -P 'Valle' | while read -r file; do
   echo "Processing $file"
   name=$(basename "${file}" | cut -d. -f1)
+  # pulisci la directory tmp prima di iniziare
+  rm -rf "${tmp_dir}"/*
   # Estrai il file nella directory di output
   unzip -o "$file" -d "${tmp_dir}"
-  # Rinomina il file estratto
-
+  
+  # verifica se il file estratto ha il nome corretto, altrimenti rinominalo
+  extracted_file=$(find "${tmp_dir}" -name "*.gpkg" -type f)
+  if [ "$(basename "$extracted_file")" != "${name}.gpkg" ]; then
+    mv "$extracted_file" "${tmp_dir}/${name}.gpkg"
+  fi
+  
+  # Sposta il file nella directory di output
+  mv "${tmp_dir}/${name}.gpkg" "${output_dir}/${name}.gpkg"
 done
