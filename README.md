@@ -135,9 +135,8 @@ Se si [lancia](https://wfs.cartografia.agenziaentrate.gov.it/inspire/wfs/owfs01.
 
 ## Chi usa questi dati
 
-La prima persona a usarli è stata **Salvatore Fiandaca**, che è anche stato colui che ci ha ispirato la creazione di questa banca dati.
+La prima persona a usarli è stata **Salvatore Fiandaca**, che è anche stato colui che ci ha ispirato la creazione di questa banca dati (grazie Salvatore).
 
-Ha realizzato uno strumento per QGIS, di cui potete leggere qui:<br>
-[Tool per QGIS](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE)
+Ha realizzato uno strumento per QGIS, di cui [potete leggere qui](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE).
 
 [![](https://raw.githubusercontent.com/pigreco/download_ple_x_attributo_WFS_AdE/main/imgs/gui.png)](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE)
