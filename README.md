@@ -133,6 +133,13 @@ Se si [lancia](https://wfs.cartografia.agenziaentrate.gov.it/inspire/wfs/owfs01.
 
 ```
 
+## Come abbiamo estratto queste coordinate
+
+Queste coordinate sono state ottenute estraendole con la funzione `ST_PointOnSurface`, su tutte le particelle catastali. La funzione `ST_PointOnSurface` restituisce un punto che è garantito essere all'interno della geometria.
+
+Come file di input per generare questa coppia di coordinate abbiamo usato i file in formato `gpkg` (uno per ogni regione), generati da Salvatore Fiandaca a partire dai file `GML` messi a disposizione dall'Agenzia delle Entrate.<br>
+Per estrarre queste coordinate è stato utilizzato duckdb con l'[estensione `spatial`](https://duckdb.org/docs/extensions/spatial/overview.html).
+
 ## Chi usa questi dati
 
 La prima persona a usarli è stata **Salvatore Fiandaca**, che è anche stato colui che ci ha ispirato la creazione di questa banca dati (grazie Salvatore).
