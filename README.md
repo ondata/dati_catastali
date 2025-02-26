@@ -140,6 +140,12 @@ Queste coordinate sono state ottenute estraendole con la funzione `ST_PointOnSur
 Come file di input per generare questa coppia di coordinate abbiamo usato i file in formato `gpkg` (uno per ogni regione), generati da Salvatore Fiandaca a partire dai file `GML` messi a disposizione dall'Agenzia delle Entrate.<br>
 Per estrarre queste coordinate è stato utilizzato duckdb con l'[estensione `spatial`](https://duckdb.org/docs/extensions/spatial/overview.html).
 
+## Se usi questi dati
+
+Questi [dati](S_0000_ITALIA/anagrafica/) sono disponibili con la [licenza CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.it), quindi sono liberamente utilizzabili, a patto di citare la fonte.
+
+Se li usi puoi scrivere "[Dati resi disponibili da OnData](https://github.com/ondata/dati_catastali)" e linkare a questo spazio (<https://github.com/ondata/dati_catastali>).
+
 ## Chi usa questi dati
 
 La prima persona a usarli è stata **Salvatore Fiandaca**, che è anche stato colui che ci ha ispirato la creazione di questa banca dati (grazie Salvatore).
