@@ -148,8 +148,18 @@ Se li usi puoi scrivere "[Dati resi disponibili da OnData](https://github.com/on
 
 ## Chi usa questi dati
 
+### Tool per QGIS
+
 La prima persona a usarli è stata **Salvatore Fiandaca**, che è anche stato colui che ci ha ispirato la creazione di questa banca dati (grazie Salvatore).
 
-Ha realizzato uno strumento per QGIS, di cui [potete leggere qui](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE).
+Ha realizzato uno strumento per QGIS, di cui [potete leggere qui](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE), che consente di scaricare le particelle catastali proprio tramite una ricerca per attributo.
 
 [![](https://raw.githubusercontent.com/pigreco/download_ple_x_attributo_WFS_AdE/main/imgs/gui.png)](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE)
+
+### Funzione personalizzata per il field calc di QGIS
+
+Una [funzione personalizzata](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE/tree/main/script) per il *field calc* di QGIS per recuperare le geometrie delle particelle catastali.
+
+E l'autore è sempre **Salvatore Fiandaca**.
+
+[![](immagini/field_calc.png)](https://github.com/pigreco/download_ple_x_attributo_WFS_AdE/tree/main/script)
