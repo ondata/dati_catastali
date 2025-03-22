@@ -73,12 +73,13 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
     CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x,
     CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
   FROM st_read('${tmp_dir}/${name}.gpkg')
-)
+  WHERE gml_id NOT LIKE '%CadastralZoning%'
+  )
 
-SELECT *
-FROM estratti
-WHERE particella IS NOT NULL
-ORDER BY comune, foglio, particella)
+  SELECT *
+  FROM estratti
+  WHERE particella IS NOT NULL
+  ORDER BY comune, foglio, particella)
   TO '${tmp_dir}/${name}.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
 
   mv "${tmp_dir}/${name}.parquet" "${output_dir}/${name}.parquet"
