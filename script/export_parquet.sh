@@ -64,20 +64,21 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
 
   # create index parquet file for each gpkg file
   duckdb -c "copy
-  (SELECT INSPIREID_LOCALID,
-      -- Municipality code (CCCC)
-      regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.([A-Z]\\d{3})', 1) AS comune,
-
-      -- Sheet number (first 4 characters after the fifth character from 'PLA.')
-      regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[A-Z]\\d{3}[A-Z_]?(\\d{4})', 1) AS foglio,
-
-      -- Parcel number (numeric only, excluding those with letters and empty strings)
-      regexp_extract(gml_id, '\\.([^.]+)$', 1) AS particella,CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x, CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
+  (WITH estratti AS (
+  SELECT
+    INSPIREID_LOCALID,
+    regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.([A-Z]\\d{3})', 1) AS comune,
+    regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[^.]+_?(\\d{4})', 1) AS foglio,
+    regexp_extract(gml_id, '\\.([^.]+)$', 1) AS particella,
+    CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x,
+    CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
   FROM st_read('${tmp_dir}/${name}.gpkg')
-  WHERE
-      regexp_extract(gml_id, '\\.([0-9]+)$', 1) IS NOT NULL
-      AND regexp_extract(gml_id, '\\.([0-9]+)$', 1) <> ''  -- Avoid empty strings
-  ORDER BY comune, foglio, TRY_CAST(particella AS INTEGER))
+)
+
+SELECT *
+FROM estratti
+WHERE particella IS NOT NULL
+ORDER BY comune, foglio, particella)
   TO '${tmp_dir}/${name}.parquet' (FORMAT 'parquet', COMPRESSION 'zstd', ROW_GROUP_SIZE 100000);"
 
   mv "${tmp_dir}/${name}.parquet" "${output_dir}/${name}.parquet"
