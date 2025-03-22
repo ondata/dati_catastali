@@ -69,7 +69,7 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
     INSPIREID_LOCALID,
     regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.([A-Z]\\d{3})', 1) AS comune,
     regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[^.]+_?(\\d{4})', 1) AS foglio,
-    regexp_extract(gml_id, '\\.([^.]+)$', 1) AS particella,
+    regexp_extract(gml_id, '^.{39}(.+)$', 1) AS particella,
     CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x,
     CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
   FROM st_read('${tmp_dir}/${name}.gpkg')
