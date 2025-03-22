@@ -72,7 +72,7 @@ find "$input_dir" -type f -name "*.zip" | while read -r file; do
       regexp_extract(gml_id, 'CadastralParcel\\.IT\\.AGE\\.PLA\\.[A-Z]\\d{3}[A-Z_]?(\\d{4})', 1) AS foglio,
 
       -- Parcel number (numeric only, excluding those with letters and empty strings)
-      regexp_extract(gml_id, '\\.([0-9]+)$', 1) AS particella,CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x, CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
+      regexp_extract(gml_id, '\\.([^.]+)$', 1) AS particella,CAST(ROUND(ST_X(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS x, CAST(ROUND(ST_Y(ST_PointOnSurface(geom)) * 1000000) AS BIGINT) AS y
   FROM st_read('${tmp_dir}/${name}.gpkg')
   WHERE
       regexp_extract(gml_id, '\\.([0-9]+)$', 1) IS NOT NULL
